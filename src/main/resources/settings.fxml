@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fx:id="root" alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.furj.danmu.SettingsController" >
+    <GridPane hgap="10" vgap="10">
+        <Label text="窗口宽度" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="windowWidthTextField"  GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <Label text="窗口高度" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="windowHeightTextField"  GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <Label text="弹幕速度" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="danmakuSpeedTextField"  GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <Label text="弹幕字体颜色" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <TextField fx:id="danmakuColorTextField"  GridPane.columnIndex="3" GridPane.rowIndex="0" />
+        <Label text="弹幕字体透明度" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <TextField fx:id="danmakuOpacityTextField"  GridPane.columnIndex="3" GridPane.rowIndex="1" />
+        <Label text="弹幕字体大小" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+        <TextField fx:id="danmakuFontSizeTextField"  GridPane.columnIndex="3" GridPane.rowIndex="2" />
+        <Label text="窗口位置x坐标（左上角）" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="windowXCoordinateTextField"  GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <Label text="窗口位置y坐标（左上角）" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="windowYCoordinateTextField"  GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <Label text="开始单词下标" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+        <TextField fx:id="startIndexTextField"  GridPane.columnIndex="3" GridPane.rowIndex="3" />
+        <Label text="每批单词数量" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+        <TextField fx:id="batchSizeTextField"  GridPane.columnIndex="3" GridPane.rowIndex="4" />
+    </GridPane>
+    <Button fx:id="applyButton" text="applyButton" onAction="#applySettings" />
+</VBox>
+
+
