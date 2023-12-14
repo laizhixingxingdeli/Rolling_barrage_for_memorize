@@ -1,7 +1,6 @@
 package com.furj.danmu;
 
 import com.furj.danmu.utils.ExcelReader;
-import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -21,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class DanmakuApp extends Application {
@@ -37,7 +37,7 @@ public class DanmakuApp extends Application {
 
     private String selectedFile;
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public Stage stage;
 
@@ -78,7 +78,7 @@ public class DanmakuApp extends Application {
 
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(getClass().getResource("/css/primary.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/primary.css")).toExternalForm());
         primaryStage.setTitle("Danmaku App");
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.setScene(scene);
@@ -124,8 +124,8 @@ public class DanmakuApp extends Application {
     public void createDanmaku() throws IOException, InvalidFormatException {
         root.getChildren().removeAll(danmakus);
         danmakus.clear();
-        String path = null;
-        if (selectedFile == "") {
+        String path;
+        if (Objects.equals(selectedFile, "")) {
             File currentDirectory = new File("");
             File[] files = currentDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xlsx"));
             if (files != null && files.length > 0) {
@@ -137,7 +137,7 @@ public class DanmakuApp extends Application {
             path = selectedFile;
         }
         List<Text> texts = ExcelReader.readExcel(path, START_INDEX, BATCH_SIZE);
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         for (int i = 0; i < WORD_INTERVAL; i++) {
             stringBuffer.append(' ');
         }
@@ -201,9 +201,8 @@ public class DanmakuApp extends Application {
         int numLines = (int) Math.floor(WINDOW_HEIGHT / lineHeight);
 
         // 随机分配弹幕的 y 坐标到 NUM_LINES 个等分区间中的一个
-        double y = (random.nextInt(numLines) + 1) * lineHeight;
 
-        return y;
+        return (random.nextInt(numLines) + 1) * lineHeight;
     }
 
 
@@ -225,40 +224,7 @@ public class DanmakuApp extends Application {
 
 
             // 创建托盘菜单项
-            MenuItem showItem = new MenuItem("Next");
-            showItem.addActionListener(e -> {
-                Platform.runLater(() -> {
-                    try {
-                        settingsController.startIndexTextField.setText(String.valueOf(START_INDEX + BATCH_SIZE));
-                        settingsController.applySettings();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (InvalidFormatException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                });
-            });
-
-            MenuItem settingsItem = new MenuItem("Settings");
-            settingsItem.addActionListener(e -> {
-                Platform.runLater(() -> {
-                    settingsStage.show();
-                    settingsStage.toFront();
-                });
-            });
-
-            MenuItem exitItem = new MenuItem("Exit");
-            exitItem.addActionListener(e -> {
-                Platform.exit();
-                tray.remove(trayIcon);
-            });
-
-            // 创建托盘菜单
-            PopupMenu trayMenu = new PopupMenu();
-            trayMenu.add(showItem);
-            trayMenu.add(settingsItem);
-            trayMenu.addSeparator();
-            trayMenu.add(exitItem);
+            PopupMenu trayMenu = getPopupMenu(settingsStage, tray, trayIcon);
             trayIcon.setPopupMenu(trayMenu);
             trayIcon.setImageAutoSize(true);
 
@@ -272,10 +238,40 @@ public class DanmakuApp extends Application {
         }
     }
 
-    private void togglePrimaryStageVisibility() {
-        Platform.runLater(() -> {
-            show = !show;
+    private PopupMenu getPopupMenu(Stage settingsStage, SystemTray tray, TrayIcon trayIcon) {
+        MenuItem showItem = new MenuItem("Next");
+        showItem.addActionListener(e -> Platform.runLater(() -> {
+            try {
+                settingsController.startIndexTextField.setText(String.valueOf(START_INDEX + BATCH_SIZE));
+                settingsController.applySettings();
+            } catch (IOException | InvalidFormatException ex) {
+                throw new RuntimeException(ex);
+            }
+        }));
+
+        MenuItem settingsItem = new MenuItem("Settings");
+        settingsItem.addActionListener(e -> Platform.runLater(() -> {
+            settingsStage.show();
+            settingsStage.toFront();
+        }));
+
+        MenuItem exitItem = new MenuItem("Exit");
+        exitItem.addActionListener(e -> {
+            Platform.exit();
+            tray.remove(trayIcon);
         });
+
+        // 创建托盘菜单
+        PopupMenu trayMenu = new PopupMenu();
+        trayMenu.add(showItem);
+        trayMenu.add(settingsItem);
+        trayMenu.addSeparator();
+        trayMenu.add(exitItem);
+        return trayMenu;
+    }
+
+    private void togglePrimaryStageVisibility() {
+        Platform.runLater(() -> show = !show);
     }
 
     private void adjustStartIndex(int offset) {
@@ -294,26 +290,23 @@ public class DanmakuApp extends Application {
     }
 
     private void registerGlobalHotkeys() {
-        JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
-            @Override
-            public void onHotKey(int identifier) {
-                switch (identifier) {
-                    case 1:
-                        togglePrimaryStageVisibility();
-                        break;
-                    case 2:
-                        adjustStartIndex(-BATCH_SIZE);
-                        break;
-                    case 3:
-                        adjustStartIndex(BATCH_SIZE);
-                        break;
-                }
+        JIntellitype.getInstance().addHotKeyListener(identifier -> {
+            switch (identifier) {
+                case 1:
+                    togglePrimaryStageVisibility();
+                    break;
+                case 2:
+                    adjustStartIndex(-BATCH_SIZE);
+                    break;
+                case 3:
+                    adjustStartIndex(BATCH_SIZE);
+                    break;
             }
         });
 
-        JIntellitype.getInstance().registerHotKey(1, JIntellitype.MOD_ALT, (int) 'X');
-        JIntellitype.getInstance().registerHotKey(2, JIntellitype.MOD_ALT, (int) 'Z');
-        JIntellitype.getInstance().registerHotKey(3, JIntellitype.MOD_ALT, (int) 'C');
+        JIntellitype.getInstance().registerHotKey(1, JIntellitype.MOD_ALT, 'X');
+        JIntellitype.getInstance().registerHotKey(2, JIntellitype.MOD_ALT, 'Z');
+        JIntellitype.getInstance().registerHotKey(3, JIntellitype.MOD_ALT, 'C');
     }
 
     @Override
