@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox fx:id="root" alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.furj.danmu.SettingsController" >
+<VBox fx:id="root" alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.furj.danmu.SettingsController" >
     <GridPane hgap="10" vgap="10">
         <Label text="窗口宽度" GridPane.columnIndex="0" GridPane.rowIndex="0" />
         <TextField fx:id="windowWidthTextField"  GridPane.columnIndex="1" GridPane.rowIndex="0" />
@@ -20,12 +20,18 @@
         <TextField fx:id="windowXCoordinateTextField"  GridPane.columnIndex="1" GridPane.rowIndex="3" />
         <Label text="窗口位置y坐标（左上角）" GridPane.columnIndex="0" GridPane.rowIndex="4" />
         <TextField fx:id="windowYCoordinateTextField"  GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <Label text="选择的文件：" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+        <Label fx:id="selectedFilePathLabel" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
         <Label text="开始单词下标" GridPane.columnIndex="2" GridPane.rowIndex="3" />
         <TextField fx:id="startIndexTextField"  GridPane.columnIndex="3" GridPane.rowIndex="3" />
         <Label text="每批单词数量" GridPane.columnIndex="2" GridPane.rowIndex="4" />
         <TextField fx:id="batchSizeTextField"  GridPane.columnIndex="3" GridPane.rowIndex="4" />
+        <Label text="单词间隔" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+        <TextField fx:id="wordIntervalTextField"  GridPane.columnIndex="3" GridPane.rowIndex="5" />
     </GridPane>
-    <Button fx:id="applyButton" text="applyButton" onAction="#applySettings" />
+    <HBox alignment="CENTER" spacing="10">
+        <Button fx:id="applyButton" text="应用设置" onAction="#applySettings" />
+        <Button fx:id="selectFile" text="选择文件" onAction="#selectFile" />
+    </HBox>
+
 </VBox>
-
-

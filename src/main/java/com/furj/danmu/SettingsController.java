@@ -2,13 +2,17 @@ package com.furj.danmu;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 
 public class SettingsController {
@@ -19,6 +23,9 @@ public class SettingsController {
 
     @FXML
     public TextField batchSizeTextField;// 数量
+
+    @FXML
+    public Label selectedFilePathLabel; // 选中的文件路径
 
     @FXML
     private VBox root;
@@ -48,6 +55,9 @@ public class SettingsController {
     public TextField windowYCoordinateTextField;// 窗口 Y 坐标
 
     @FXML
+    public TextField wordIntervalTextField; // 文字间隔
+
+    @FXML
     private Button applyButton;
 
     private Properties properties;
@@ -59,7 +69,7 @@ public class SettingsController {
     }
 
     @FXML
-    private void applySettings() throws IOException, InvalidFormatException, InterruptedException {
+    public void applySettings() throws IOException, InvalidFormatException {
         stage.setValues();
         stage.stage.setX(Integer.parseInt(windowXCoordinateTextField.getText()));
         stage.stage.setY(Integer.parseInt(windowYCoordinateTextField.getText()));
@@ -68,6 +78,8 @@ public class SettingsController {
         //弹幕文字列表
         properties.setProperty("start_index", startIndexTextField.getText() != null && !startIndexTextField.getText().isEmpty() ? startIndexTextField.getText() : "0");
         properties.setProperty("batch_size", batchSizeTextField.getText() != null && !batchSizeTextField.getText().isEmpty() ? batchSizeTextField.getText() : "10");
+        properties.setProperty("word_interval", wordIntervalTextField.getText()!= null &&!wordIntervalTextField.getText().isEmpty()? wordIntervalTextField.getText() : "5");
+        properties.setProperty("selected_file_path", (selectedFilePathLabel.getText() == null || Objects.equals(selectedFilePathLabel.getText(), "")) ? "" : selectedFilePathLabel.getText());
         stage.createDanmaku();
         //窗口设置
         properties.setProperty("window_width", windowWidthTextField.getText() != null && !windowWidthTextField.getText().isEmpty() ? windowWidthTextField.getText() : "1000");
@@ -107,6 +119,8 @@ public class SettingsController {
             properties.setProperty("danmaku_opacity", "0.8");
             properties.setProperty("window_x", "0");
             properties.setProperty("window_y", "0");
+            properties.setProperty("word_interval", "5");
+            properties.setProperty("selected_file_path", "");
 
             // 将新的 Properties 对象写入配置文件中
             try {
@@ -129,7 +143,27 @@ public class SettingsController {
         danmakuOpacityTextField.setText(properties.getProperty("danmaku_opacity"));
         windowXCoordinateTextField.setText(properties.getProperty("window_x"));
         windowYCoordinateTextField.setText(properties.getProperty("window_y"));
+        wordIntervalTextField.setText(properties.getProperty("word_interval"));
+        selectedFilePathLabel.setText(properties.getProperty("selected_file_path"));
     }
+    @FXML
+    public void selectFile() throws IOException, InvalidFormatException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择文件");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.dir"))); // start in the current directory
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel files (*.xlsx)", "*.xlsx")); // restrict to .xlsx files
+        File selectedFile = fileChooser.showOpenDialog(root.getScene().getWindow());
+        if (selectedFile != null) {
+            // Update the text field with the selected file path
+            // For example:
+            System.out.println(selectedFile.getAbsolutePath());
+            selectedFilePathLabel.setText(selectedFile.getAbsolutePath());
+            startIndexTextField.setText("0");
+            applySettings();
+        }
+    }
+
+
 
 
 }

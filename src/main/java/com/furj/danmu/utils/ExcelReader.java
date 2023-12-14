@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -24,11 +25,21 @@ public class ExcelReader {
             // 获取工作表
             XSSFSheet sheet = workbook.getSheetAt(0);
 
+            // 检查实际行数
+            int rowCount = sheet.getLastRowNum() + 1;
+            if (startRow >= rowCount) {
+                // 数据行数不足
+                return Collections.emptyList();
+            }
+
+            // 计算实际可用的行数
+            int availableRowCount = Math.min(count, rowCount - startRow);
+
             // 使用流读取数据
             Iterable<Row> rows = sheet::rowIterator;
             List<Text> texts = StreamSupport.stream(rows.spliterator(), false)
                     .skip(startRow)
-                    .limit(count)
+                    .limit(availableRowCount)
                     .map(row -> {
                         Cell wordCell = row.getCell(0);
                         String word = wordCell.toString();
@@ -47,5 +58,4 @@ public class ExcelReader {
             opcPackage.close();
         }
     }
-
 }
