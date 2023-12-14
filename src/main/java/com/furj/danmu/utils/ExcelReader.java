@@ -19,9 +19,8 @@ public class ExcelReader {
     public static List<Text> readExcel(String path, int startRow, int count) throws IOException, InvalidFormatException {
         // 打开Excel文件
         File file = new File(path);
-        OPCPackage opcPackage = OPCPackage.open(file);
 
-        try (XSSFWorkbook workbook = new XSSFWorkbook(opcPackage)) {
+        try (OPCPackage opcPackage = OPCPackage.open(file); XSSFWorkbook workbook = new XSSFWorkbook(opcPackage)) {
             // 获取工作表
             XSSFSheet sheet = workbook.getSheetAt(0);
 
@@ -37,7 +36,8 @@ public class ExcelReader {
 
             // 使用流读取数据
             Iterable<Row> rows = sheet::rowIterator;
-            List<Text> texts = StreamSupport.stream(rows.spliterator(), false)
+
+            return StreamSupport.stream(rows.spliterator(), false)
                     .skip(startRow)
                     .limit(availableRowCount)
                     .map(row -> {
@@ -51,11 +51,7 @@ public class ExcelReader {
                         return new Text(textString);
                     })
                     .collect(Collectors.toList());
-
-            return texts;
-        } finally {
-            // 关闭输入流
-            opcPackage.close();
         }
+        // 关闭输入流
     }
 }
